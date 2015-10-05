@@ -4,27 +4,23 @@
 (require "utilities.rkt")
 (require (prefix-in gui: racket/gui))
 
-(define (make-timer updateFrequency object procedure)
-  (let ((counter 0)
-        (active FALSE)
-        (timer 0)
-        (updateFrequency updateFrequency)
+(define (make-timer timerLength object command)
+  (let ((timerLength timerLength)
         (object object)
-        (procedure procedure))
+        (command command))
+
+    (define timer
+      (new gui:timer%
+           [notify-callback ; What to do if timer expires?
+            (lambda ()
+              (send object command))]
+           [interval FALSE])) ; FALSE to make sure timer doesn't start right away
     
     (define (start)
-      (set! active TRUE)
-      (set! timer (new gui:timer%
-           (interval updateFrequency)
-           (notify-callback
-            (lambda ()
-              (cond [active
-                     (send object procedure)]
-                    [else
-                     (send timer stop)]))))))
+      (gui:send timer start timerLength))
 
     (define (stop)
-      (set! active FALSE))
+      (gui:send timer stop))
 
     (define (dispatch message)
       (case message

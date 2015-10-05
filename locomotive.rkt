@@ -4,27 +4,27 @@
 (require "timer.rkt")
 
 (define (make-locomotive position wagons)
-  (let ((trainPosition position)
-        (trainSpeed 0)
-        (trainWagons wagons))
+  (let ((locoPosition position)
+        (locoSpeed 0)
+        (locoWagons wagons))
 
     (define (getPosition)
-      trainPosition)
+      locoPosition)
 
     (define (updatePosition)
-      (let ((x (car trainPosition))
-            (y (cdr trainPosition)))
-        (set! trainPosition (cons (+ x 1) (+ y 1)))
-        (display trainPosition)))
+      (let ((x (car locoPosition))
+            (y (cdr locoPosition)))
+        (set! locoPosition (cons (+ x 1) (+ y 1)))
+        (display locoPosition)))
 
     (define (getSpeed)
-      trainSpeed)
+      locoSpeed)
 
     (define (setSpeed! newSpeed)
-      (set! trainSpeed newSpeed))
+      (set! locoSpeed newSpeed))
 
     (define (getWagons)
-      wagons)
+      locoWagons)
 
     (define (dispatch message)
       (case message
