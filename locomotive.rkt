@@ -2,14 +2,19 @@
 
 (require "utilities.rkt")
 (require "timer.rkt")
+(require "wagon.rkt")
 
 (define (make-locomotive position wagons)
-  (let ((locoPosition position)
-        (locoSpeed 0)
-        (locoWagons wagons))
+  (let* ((locoPosition position)
+         (locoSpeed 0)
+         (locoWagons wagons)
+         (locoLength (+ 1 (length locoWagons))))
 
-    (define (getPosition)
-      locoPosition)
+    (define (getXPosition)
+      (car locoPosition))
+
+    (define (getYPosition)
+      (cdr locoPosition))
 
     (define (updatePosition)
       (let ((x (car locoPosition))
@@ -23,25 +28,33 @@
     (define (setSpeed! newSpeed)
       (set! locoSpeed newSpeed))
 
+    (define (getLength)
+      locoLength)
+
     (define (getWagons)
       locoWagons)
 
     (define (dispatch message)
       (case message
-        ((getPosition) getPosition)
+        ((getXPosition) getXPosition)
+        ((getYPosition) getYPosition)
         ((updatePosition) updatePosition)
         ((getSpeed) getSpeed)
         ((setSpeed!) setSpeed!)
+        ((getLength) getLength)
         ((getWagons) getWagons)))
 
     dispatch))
 
 (define position (cons 0 0))
-(define wagons (list 1 2 3 4 5))
+(define wagon1 (make-wagon 1 'kool))
+(define wagon2 (make-wagon 2 'kool))
+(define wagons (list wagon1 wagon2))
 (define train (make-locomotive position wagons))
-(define timer (make-timer 100 train 'updatePosition))
-(send timer 'start)
+;(define timer (make-timer 100 train 'updatePosition))
+;(send timer 'start)
 (display (send train 'getPosition)) (newline)
 (display (send train 'getSpeed)) (newline)
 (send train 'setSpeed! 50)
-(display (send train 'getSpeed))
+(display (send train 'getSpeed)) (newline)
+(display "Lengte v/d trein = ") (display (send train 'getLength))
