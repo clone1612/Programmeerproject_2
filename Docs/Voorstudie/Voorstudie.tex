@@ -1,0 +1,336 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage[backend=biber]{biblatex}
+
+\title{Programmeerproject 2: Voorstudie}
+\author{Jannick Hemelhof}
+
+\begin{document}
+
+\maketitle
+\newpage
+  \tableofcontents
+\newpage
+\pagenumbering{arabic}
+
+\section{Overzichtsdiagram}
+
+\begin{figure}[hb]%                 use [hb] only if necceccary!
+  \centering
+  \includegraphics[scale=0.7]{overzichtsdiagram}
+  \caption{Overzichtsdiagram}
+  \label{fig:test}
+\end{figure}
+De pijlen hebben volgende betekenis:
+\begin{itemize}
+  \item zwarte pijl met gevulde punt "x $\rightarrow$ y" : Dit wil zeggen dat x gebruikt maakt van y, x doet dus beroep op de 'make'-functie van y en vervolgens met dit object zal werken (er mee communiceren).
+  \item groene pijl met gevulde punt "x $\rightarrow$ y" : Dit wil zeggen dat x enkel en alleen communiceert met y, het geeft dus aan hoe de belangrijkste lijnen van de communicatie lopen.
+  \item zwarte pijl met lege punt "x $\rightarrow$ y" : Deze pijl heeft als betekenis dat x het object y alleen maar zal aanmaken. Het wordt eventueel meegegeven aan andere objecten die x zal aanmaken maar er wordt niet (rechtstreeks) gecommuniceerd met y.
+\end{itemize}
+
+\section{Bespreking ADTs}
+
+\subsection{route} % OK
+Een ADT dat instaat voor het beheer van een route over meerdere segmenten en/of wissels heen. Houdt bij welke segmenten we moeten bereiken om vanuit onze origin naar de destination te geraken. Bij aanmaak worden twee argumenten meegegeven met een optioneel derde argument:
+\begin{itemize}
+  \item origin: Van waar vertrekt deze route?
+  \item destination: Naar waar gaat deze route?
+  \item path: Optioneel derde argument in de vorm van een lijst met te volgen segmenten en/of wissels. Geeft aan welk pad de route exact moet volgen.
+\end{itemize}
+Indien we geen derde argument meegeven \textit{kan} er gebruik worden gemaakt van een optimaal pad dat wordt gezocht tussen origin en destination.
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | l | l | p{8cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    getOrigin & / & origin (string) & Geeft de oorsprong van de route terug in de vorm van een string. \\ \hline
+    getDestination & / & destination (string) & Geeft de bestemming van de route terug in de vorm van een string. \\ \hline
+    getLength & / & length (number) & Geeft de lengte van de route terug in de vorm van een number. \\ \hline
+    detected! & / & / & Geeft aan dat we het volgende detectieblok voorbij zijn en dat we dit hier ook moeten aanpassen. Op deze manier weten we hoe ver we gevorderd zijn op de route en kunnen we indien nodig een trein die het kortst bij zijn bestemming is een hogere prioriteit geven bij een obstakel/ongeval. \\ \hline
+    getTodo & / & todo (list) & Zorgt ervoor dat we een lijst terugkrijgen met daarin de route tot aan het volgende detectieblok. \\ \hline
+    \end{tabular}
+\end{center}
+
+\noindent Met het \textit{getTodo} commando kan het NMBS-gedeelte eenvoudig bepalen welke commando's naar het Infrabel-gedeelte moeten gestuurd worden om de route voor een zekere trein mogelijk te maken.
+
+\subsection{timer} % OK
+Dankzij dit ADT kunnen we de notie van tijdsevolutie gebruiken in het project. Bij aanmaak worden drie argumenten meegegeven:
+\begin{itemize}
+  \item timerLength: Hoelang later we onze timer steeds lopen?
+  \item object: Naar welk object zullen we de boodschap sturen telkens de timer afloopt?
+  \item message: Welke boodschap sturen we naar het object als de timer telkens de timer afloopt?
+\end{itemize}
+Een timer volgt dus volgend principe:
+\begin{enumerate}
+  \item Timer wordt aangemaakt. Is nog niet actief.
+  \item Timer ontvangt boodschap 'start'
+  \item Timer begint te lopen vanaf timerLength tot 0
+  \item 0 wordt bereikt, stuur message naar het object. Ga opnieuw naar 3.
+\end{enumerate}
+Dit wordt steeds herhaald tot de timer de boodschap 'stop' ontvangt. Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | l | l | p{8cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    start & / & / & Laat de timer starten \\ \hline
+    stop & / & / & Laat de timer stoppen \\ \hline
+    setTimerLength! & timerLength (number) & / & Past de lengte van de timer aan naar de meegegeven lengte. \\ \hline
+    setObject! & object (object) & / & Stuur de boodschap naar een ander object, zijnde het meegegeven object. \\ \hline
+    setMessage! & message (string) & / & Stuur een andere boodschap naar het object, zijnde de meegegeven boodschap. \\ \hline
+    \end{tabular}
+\end{center}
+
+\subsection{signal} % OK
+Dit ADT stelt een licht voor dat zich kan bevinden op een segment. Het houdt een status bij en stelt andere objecten in staat om deze status op te vragen en aan te passen. Bij aanmaak wordt \'{e}\'{e}n argument meegegeven:
+\begin{itemize}
+  \item id: Uniek ID dat het licht identificeert
+\end{itemize}
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | l | l | p{8cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    getID & / & id (string) & Geeft het ID van het licht terug in de vorm van een string. \\ \hline
+    getStatus & / & status (string) & Geeft de status van het licht terug in de vorm van een string. \\ \hline
+    setStatus! & status (string) & / & Past de status van het licht aan naar de meegegeven status. \\ \hline
+    \end{tabular}
+\end{center}
+
+\subsection{logger} % OK
+Een ADT dat zal instaan voor het loggen - in dit geval wegschrijven naar een bestand - van de belangrijke gebeurtenissen die plaatsvinden tijdens het uitvoeren van de simulatie. Bij aanmaak worden geen argumenten meegegeven.
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | p{3.5cm} | l | p{8cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    addTrain & id (string) & / & Logt dat er een nieuwe trein 'id' is toegevoegd. \\ \hline
+    segmentPassed & trainID (string) + segmentID (string) & / & Logt dat een trein 'trainID' een segment 'segmentID' is gepasseerd. \\ \hline
+    switchPassed & trainName (string) + switchName (string) & / & Logt dat een trein 'trainID' een wissel 'switchID' is gepasseerd. \\ \hline
+    speedChanged & trainID (string) + newSpeed (number) & / & Logt dat een trein 'trainID' vertraagt/versnelt tot snelheid 'newSpeed'. \\ \hline
+    directionChanged & trainID (string) + newDirection (number) & / & Logt dat een trein 'trainID' naar richting 'newDirection' is veranderd. \\ \hline
+    trainStop & trainID (string) + reason (string) & / & Logt een een trein 'trainID' gestopt is vanwege 'reason'. \\ \hline
+    switchChange & switchID (string) + newPosition (number) & / & Logt dat een switch 'switchID' schakelt naar positie 'newPosition'. \\ \hline
+    signalChange & signalID (string) + newStatus (string) & / & Logt dat een signaal 'signalID' een nieuwe status 'newStatus' heeft. \\ \hline
+    messageSend & message (string) & / & Logt dat er een commando werd verstuurd naar Infrabel \\ \hline
+    \end{tabular}
+\end{center}
+
+Een apart commando is beschikbaar in de logger om aan te geven dat er een bericht werd verstuurd naar Infrabel. Aangezien in deel 2 deze via het netwerk moet bereikt worden is het handig om te weten of er wel degelijk een commando over het netwerk werd gestuurd.
+
+\iffalse
+\subsection{position}
+Een klein ADT dat een positie zal voorstellen. In dit geval op een x- en y-as maar dit kan makkelijk worden aangepast. Bij aanmaak worden twee argumenten meegegeven:
+\begin{itemize}
+  \item x: Positie op de x-as
+  \item y: Positie op de y-as
+\end{itemize}
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | l | l | p{8cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    getX & / & x (number) & Geeft de positie op de x-as terug in de vorm van een number. \\ \hline
+    getY & / & y (number) & Geeft de positie op de y-as terug in de vorm van een number. \\ \hline
+    setX! & newX (number) & / & Past de positie op de x-as aan naar de gegeven positie. \\ \hline
+    setY! & newY (number) & / & Past de positie op de y-as aan naar de gegeven positie. \\ \hline
+    \end{tabular}
+\end{center}
+\fi
+
+\subsection{locomotive}
+Het ADT dat een locomotief zal voorstellen. Zal zelfstandig zijn positie updaten aan de hand van het segment of de wissel waar hij zich op bevindt en zijn snelheid. Houdt ook de aan de locomotief bevestigde wagons bij. Bij aanmaak worden vijf argumenten meegegeven:
+\begin{itemize}
+  \item name: Een naam voor de trein.
+  \item id: Een uniek ID voor de trein.
+  \item length: Geeft aan hoeveel wagons er zullen hangen aan de locomotief.
+  \item speed: De beginsnelheid van de trein.
+  \item position: Beginpositie van de trein.
+\end{itemize}
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | l | l | p{6.5cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    getName & / & name (string) & Geeft de naam van de trein terug in de vorm van een string. \\ \hline
+    getID & / & id (string) & Geeft het unieke ID van de trein terug in de vorm van een string. \\ \hline
+    getLength & / & length (number) & Geeft de lengte van de trein terug in de vorm van een number. \\ \hline
+    getSpeed & / & speed (number) & Geeft de snelheid van de trein terug in de vorm van een number. \\ \hline
+    setSpeed! & newSpeed (number) & / & Past de snelheid van de trein aan naar de meegegeven snelheid. \\ \hline
+    getPosition & / & position (position) & Geeft de huidige positie van de trein terug in de vorm van een positie. \\ \hline
+    updatePosition! & / & / & Zorgt dat de trein zijn positie zelfstandig zal updaten aan de hand van waarop hij zich momenteel bevindt alsook zijn snelheid. \\ \hline
+    \end{tabular}
+\end{center}
+Een belangrijk detail in verband met de positie: de positie wordt niet aan de simulator gevraagd, wel aan de trein zelf die deze onafhankelijk bijwerkt. Op deze manier komt het al conceptueel overeen met fase 2 en het werken met een modelopstelling.
+
+\subsection{wagon}
+Een ADT dat een wagon voorsteld. Een wagon heeft enkel een uniek ID alsook een type dat aangeeft wat de wagon precies vervoert. Bij aanmaak worden twee argumenten meegegeven:
+\begin{itemize}
+  \item id: Een uniek ID voor de wagon.
+  \item type: Wat de wagon precies vervoert.
+\end{itemize}
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | l | l | p{8cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    getID & / & id (string) & Geeft het ID van de wagon terug in de vorm van een string. \\ \hline
+    getType & / & type (string) & Geeft het type van de wagon terug in de vorm van een string. \\ \hline
+    setType! & newType (string) & / & Past het type van de wagon aan naar het meegegeven type. \\ \hline
+    \end{tabular}
+\end{center}
+
+\subsection{switch}
+Dit ADT stelt een wissel voor. Er wordt bijgehouden welke segmentRoutes binnenin de wissel mogelijk zijn, wat de huidig segmentRoute is (er kan er maar één actief zijn) maar ook eventueel in welke volgorde een schakeling tussen verschillende segmentRoutes moet gebeuren. Bij aanmaak worden vijf argumenten meegegeven met een optioneel zesde:
+\begin{itemize}
+  \item name: Een naam voor de wissel.
+  \item id: Een uniek ID voor de wissel.
+  \item layout: Een layout-ID dat de GUI kan gebruiken om te bepalen hoe de wissel getoond moet worden.
+  \item segmentRoutes: Een lijst (minimale lengte 2) met de mogelijke segmentRoutes.
+  \item default: Welke segmentRoute wordt gezien als de "default" (d.w.z. conceptueel gezien rechtdoor)?
+  \item switchOrder: Optioneel zesde argument dat aangeeft hoe er tussen de verschillende mogelijke segmentRoutes geschakeld moet worden.
+\end{itemize}
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | l | l | p{8cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    getName & / & name (string) & Geeft de naam van de wissel terug in de vorm van een string. \\ \hline
+    getID & / & id (string) & Geeft het ID van de wissel terug in de vorm van een string. \\ \hline
+    getLayout & / & layout (string) & Geeft de layout van de wissel terug in de vorm van een string. \\ \hline
+    getActive & / & active (segmentRoute) & Geeft de huidig actieve segmentRoute terug in de vorm van een segmentRoute. \\ \hline
+    setActive! & mode (int) & / & Laat de wissel schakelen naar de gegeven mode. \\ \hline
+    \end{tabular}
+\end{center}
+
+\subsection{segment}
+Een ADT dat een normaal treinsegment zonder wissels voorstelt. Er wordt bijgehouden welke segmentRoutes binnen het segment mogelijk zijn. Bij aanmaak worden 4 argumenten meegegeven:
+\begin{itemize}
+  \item name: Een naam voor het segment.
+  \item id: Een uniek ID voor het segment.
+  \item layout: Een layout-ID dat de GUI kan gebruiken om te bepalen hoe het segment getoond moet worden.
+  \item segmentRoutes: Een lijst met de mogelijke segmentRoutes.
+\end{itemize}
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | l | l | p{4cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    getName & / & name (string) & Geeft de naam van het segment terug in de vorm van een string. \\ \hline
+    getID & / & id (string) & Geeft het ID van het segment terug in de vorm van een string. \\ \hline
+    getLayout & / & layout (string) & Geeft de layout van het segment terug in de vorm van een string. \\ \hline
+    getSegmentRoute & destination (string) & segmentRoute (segmentRoute) & Geeft de segmentRoute naar de destination terug in de vorm van een segmentRoute. \\ \hline
+    \end{tabular}
+\end{center}
+
+\subsection{controlSystem}
+Dit ADT is een ADT dat het infrastructuur- en beheergedeelte overkoepelt. Het zal er dan ook voor zorgen dat de boodschappen die het ontvangt worden doorgespeeld aan het conceptueel verantwoordelijke ADT. De reden waarom het op deze manier wordt gedaan is zodat wanneer de verantwoordelijkheid verandert, bv. de nmbs wordt verantwoordelijk voor de wissels, dan moet er niets veranderen bij objecten die wissels willen manipuleren. Zij geven gewoon aan dat ze dit willen doen aan het overkoepelde ADT en dit maakt dan ook uit wie verantwoordelijk is. Bij aanmaak wordt 1 argument meegegeven:
+\begin{itemize}
+  \item logger: Een logger die het controlesysteem zal gebruiken.
+\end{itemize}
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | p{4cm} | l | p{6cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    addTrain & speed (number) + length (number) + pos (position) + name (string) + id (string) & / & Voegt een trein toe die zal worden beheerd door het controlSystem. \\ \hline
+    manipulateTrain & id (string) + command (string) + extra (list) & / & Zal een trein 'id' een bepaalt commando 'command' laten uitvoeren, eventueel aan de hand van optionele paramaters 'extra'. \\ \hline
+    manipulateSignal & id (string) + newStatus (string) & / & Zal de status van een signaal 'id' veranderen naar de meegegeven status 'newStatus'. \\ \hline
+    manipulateSwitch & id (string) + newMode (int) & / & Zal een wissel laten schakelen naar de nieuwe modus 'newMode' indien dit niet zorgt voor het onmogelijk maken van bepaalde routes. \\ \hline
+    manipulateSegment & id (string) + maxSpeed (int) & / & Zal een segment/wissel 'id' een maximumsnelheid 'maxSpeed' opleggen. \\ \hline
+    setRoute & id (string) + destination (string) & / & Zal een trein 'id' een route opleggen met bestemming 'destination'. \\ \hline
+    start & / & / & Zal het controlesysteem inschakelen. \\ \hline
+    stop & / & / & Zal het controlesysteem uitschakelen. \\ \hline
+    \end{tabular}
+\end{center}
+
+\newpage
+
+\subsection{infrastructure}
+ADT dat specifiek instaat voor de infrastructuur, d.w.z. het aansturen van wissels en signalisatie maar ook zorgt voor het respecteren van de veiligheid (afstand tussen treinen bijvoorbeeld). Bij aanmaak worden geen argumenten meegegeven.
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | p{4cm} | l | p{6cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    addTrain & loco (locomotive) & / & Voegt een trein toe. \\ \hline
+    manipulateTrain & id (string) + command (string) + extra (list) & / & Zal een trein 'id' een bepaalt commando 'command' laten uitvoeren, eventueel aan de hand van optionele paramaters 'extra'. \\ \hline
+    manipulateSignal & id (string) + newStatus (string) & / & Zal de status van een signaal 'id' veranderen naar de meegegeven status 'newStatus'. \\ \hline
+    manipulateSwitch & id (string) + newMode (int) & / & Zal een wissel laten schakelen naar de nieuwe modus 'newMode' indien dit niet zorgt voor het onmogelijk maken van bepaalde routes. \\ \hline
+    manipulateSegment & id (string) + maxSpeed (int) & / & Zal een segment/wissel 'id' een maximumsnelheid 'maxSpeed' opleggen. \\ \hline
+    start & / & / & Zal het monitoren van de infrastructuur inschakelen. \\ \hline
+    stop & / & / & Zal het monitoren van de infrastructuur uitschakelen. \\ \hline
+    \end{tabular}
+\end{center}
+Alle manipulaties vertrekken vanuit dit ADT naar de simulator indien het een geldig commando is dat niet in conflict is met eerder uitgevoerde manipulaties en de geplande routes niet verstoord. Dit wordt gedaan met in het achterhoofd fase 2 omdat we zo onnodige communicatie met een extern apparaat vermijden indien we op voorhand al weten dat het commando niet zal worden uitgevoerd.
+
+\subsection{management}
+ADT dat instaat voor beheer van routes. Zal voor elk trein-ID een route bijhouden en op deze manier het infrastructuurgedeelte toestaan te bepalen welke wissels moeten schakelen. Bij aanmaak worden geen argumenten meegegeven.
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | p{4cm} | l | p{8cm} |}
+    \hline
+    planRoute & start (string) + destination (string) & route & Plant een route tussen 'start' en 'destination' en geeft deze dan terug in de vorm van een route. \\ \hline
+    createRoute & start (string) + destination (string) + segments (list) & route & Maakt een route aan tussen 'start' en 'destination' die gebruik maakt van bepaalde segments/wissels en geeft deze dan terug in de vorm van een route. \\ \hline
+    assignRoute & id (string) + route (route) & / & Wijst aan een trein 'id' een bepaalde route 'route' toe. \\ \hline
+    getPosition & id (string) & pos (position) & Geeft terug waar een trein 'id' zich precies op zijn route bevindt in de vorm van een position. \\ \hline
+    \end{tabular}
+\end{center}
+
+\subsection{simulator}
+Een ADT dat onze virtuele opstelling zal bijhouden. Encapsuleert dus een weergave van het veld, een raster van segmenten/wissels.
+Bij aanmaak worden geen argumenten meegegeven.
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | p{4cm} | l | p{6cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    addTrain & loco (locomotive) & / & Voegt een trein toe. \\ \hline
+    manipulateTrain & id (string) + command (string) + extra (list) & / & Zal een trein 'id' een bepaalt commando 'command' laten uitvoeren, eventueel aan de hand van optionele paramaters 'extra'. \\ \hline
+    manipulateSignal & id (string) + newStatus (string) & / & Zal de status van een signaal 'id' veranderen naar de meegegeven status 'newStatus'. \\ \hline
+    manipulateSwitch & id (string) + newMode (int) & / & Zal een wissel laten schakelen naar de nieuwe modus 'newMode'. \\ \hline
+    manipulateSegment & id (string) + maxSpeed (int) & / & Zal een segment/wissel 'id' een maximumsnelheid 'maxSpeed' opleggen. \\ \hline
+    getLayout & / & layout (list) & Zal een lijst teruggegeven met de opbouw van het veld zodat we het kunnen tekenen. \\ \hline
+    start & / & / & Zal de simulator starten. \\ \hline
+    stop & / & / & Zal de simulator stoppen. \\ \hline
+    \end{tabular}
+\end{center}
+
+\subsection{gui}
+ADT dat de interface en eigelijk het hele programma zal beheren. Bij aanmaak worden twee argumenten meegegeven:
+\begin{itemize}
+  \item height: Hoe hoog moet het venster zijn?
+  \item width: Hoe breed moet het venster zijn?
+\end{itemize}
+Volgende booschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | l | l | p{8cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    draw & / & / & Zorgt dat het venster zal worden getekend. \\ \hline
+    \end{tabular}
+\end{center}
+
+\newpage
+
+\section{Planning}
+\begin{center}
+    \begin{tabular}{ | l | l |}
+    \hline
+    Week & Omschrijving \\ \hline
+    6 & Design ADTs + werken aan verslag \\ \hline
+    7 & Finaliseren verslag + bouwen van ADT timer \\ \hline
+    8 & Afwerken ADTs locomotive, wagon, signal, position \\ \hline
+    9 & Afwerken ADTs segment, switch, route, segmentRoute \\ \hline
+    10 & Afwerken ADTs controlSystem, logger, infrastructure, management \\ \hline
+    11 & Afwerken simulator + communicatie tussen simulator en infrastructure/management \\ \hline
+    12 & Basis van GUI en communicatie tussen GUI en simulator/controlSystem \\ \hline
+    13 & GUI \\ \hline
+    14 & GUI afwerken \\ \hline
+    15 & Nakijken code + werken aan verslag \\ \hline
+    16 & Finaliseren verslag \\ \hline
+    \end{tabular}
+\end{center}
+
+\end{document}
