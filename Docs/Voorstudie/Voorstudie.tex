@@ -110,9 +110,9 @@ Volgende boodschappen worden door het ADT ondersteund:
     switchPassed & trainName (string) + switchName (string) & / & Logt dat een trein 'trainID' een wissel 'switchID' is gepasseerd. \\ \hline
     speedChanged & trainID (string) + newSpeed (number) & / & Logt dat een trein 'trainID' vertraagt/versnelt tot snelheid 'newSpeed'. \\ \hline
     directionChanged & trainID (string) + newDirection (number) & / & Logt dat een trein 'trainID' naar richting 'newDirection' is veranderd. \\ \hline
-    trainStop & trainID (string) + reason (string) & / & Logt een een trein 'trainID' gestopt is vanwege 'reason'. \\ \hline
-    switchChange & switchID (string) + newPosition (number) & / & Logt dat een switch 'switchID' schakelt naar positie 'newPosition'. \\ \hline
-    signalChange & signalID (string) + newStatus (string) & / & Logt dat een signaal 'signalID' een nieuwe status 'newStatus' heeft. \\ \hline
+    trainStopped & trainID (string) + reason (string) & / & Logt een een trein 'trainID' gestopt is vanwege 'reason'. \\ \hline
+    switchChanged & switchID (string) + newPosition (number) & / & Logt dat een switch 'switchID' schakelt naar positie 'newPosition'. \\ \hline
+    signalChanged & signalID (string) + newStatus (string) & / & Logt dat een signaal 'signalID' een nieuwe status 'newStatus' heeft. \\ \hline
     messageSend & message (string) & / & Logt dat er een commando werd verstuurd naar Infrabel \\ \hline
     \end{tabular}
 \end{center}
@@ -139,32 +139,28 @@ Volgende boodschappen worden door het ADT ondersteund:
 \end{center}
 \fi
 
-\subsection{locomotive}
-Het ADT dat een locomotief zal voorstellen. Zal zelfstandig zijn positie updaten aan de hand van het segment of de wissel waar hij zich op bevindt en zijn snelheid. Houdt ook de aan de locomotief bevestigde wagons bij. Bij aanmaak worden vijf argumenten meegegeven:
+\newpage
+\subsection{locomotive} % OK
+Het ADT dat een locomotief zal voorstellen en ook zal bijhouden welke wagons er eventueel aan vasthangen. Bij aanmaak worden twee argumenten meegegeven met een optioneel derde:
 \begin{itemize}
-  \item name: Een naam voor de trein.
   \item id: Een uniek ID voor de trein.
-  \item length: Geeft aan hoeveel wagons er zullen hangen aan de locomotief.
-  \item speed: De beginsnelheid van de trein.
   \item position: Beginpositie van de trein.
+  \item wagons: Optioneel derde argument dat de wagons vastgemaakt aan de locomotief bevat.
 \end{itemize}
 Volgende boodschappen worden door het ADT ondersteund:
 \begin{center}
     \begin{tabular}{ | l | l | l | p{6.5cm} |}
     \hline
     Commando & Argument(en) & Return value & Omschrijving \\ \hline
-    getName & / & name (string) & Geeft de naam van de trein terug in de vorm van een string. \\ \hline
-    getID & / & id (string) & Geeft het unieke ID van de trein terug in de vorm van een string. \\ \hline
-    getLength & / & length (number) & Geeft de lengte van de trein terug in de vorm van een number. \\ \hline
-    getSpeed & / & speed (number) & Geeft de snelheid van de trein terug in de vorm van een number. \\ \hline
-    setSpeed! & newSpeed (number) & / & Past de snelheid van de trein aan naar de meegegeven snelheid. \\ \hline
-    getPosition & / & position (position) & Geeft de huidige positie van de trein terug in de vorm van een positie. \\ \hline
-    updatePosition! & / & / & Zorgt dat de trein zijn positie zelfstandig zal updaten aan de hand van waarop hij zich momenteel bevindt alsook zijn snelheid. \\ \hline
+    getID & / & id (string) & Geeft het unieke ID van de locomotief terug in de vorm van een string. \\ \hline
+    getSpeed & / & speed (number) & Geeft de snelheid van de locomotief terug in de vorm van een number. \\ \hline
+    setSpeed! & newSpeed (number) & / & Past de snelheid van de locomotief aan naar de meegegeven snelheid. \\ \hline
+    getLastSeen & / & lastSeen (string) & Geeft het segment (detectieblok) terug waar de locomotief voor het laatst werd gezien. \\ \hline
+    updateLastSeen! & lastSeen (string) & / & Past aan waar de locomotief voor het laatst werd gezien. \\ \hline
     \end{tabular}
 \end{center}
-Een belangrijk detail in verband met de positie: de positie wordt niet aan de simulator gevraagd, wel aan de trein zelf die deze onafhankelijk bijwerkt. Op deze manier komt het al conceptueel overeen met fase 2 en het werken met een modelopstelling.
 
-\subsection{wagon}
+\subsection{wagon} % OK
 Een ADT dat een wagon voorsteld. Een wagon heeft enkel een uniek ID alsook een type dat aangeeft wat de wagon precies vervoert. Bij aanmaak worden twee argumenten meegegeven:
 \begin{itemize}
   \item id: Een uniek ID voor de wagon.
@@ -178,49 +174,49 @@ Volgende boodschappen worden door het ADT ondersteund:
     getID & / & id (string) & Geeft het ID van de wagon terug in de vorm van een string. \\ \hline
     getType & / & type (string) & Geeft het type van de wagon terug in de vorm van een string. \\ \hline
     setType! & newType (string) & / & Past het type van de wagon aan naar het meegegeven type. \\ \hline
+    getLoad & / & amount (int) & Geeft aan hoezeer de wagon gevult is \\ \hline
+    load! & amount (int) & / & Vult de wagon met een bepaalde hoeveelheid ('amount') van zijn type \\ \hline
+    unload! & amount (int) & / & Haalt een bepaalde hoeveelheid ('amount') uit de wagon \\ \hline
     \end{tabular}
 \end{center}
 
-\subsection{switch}
-Dit ADT stelt een wissel voor. Er wordt bijgehouden welke segmentRoutes binnenin de wissel mogelijk zijn, wat de huidig segmentRoute is (er kan er maar één actief zijn) maar ook eventueel in welke volgorde een schakeling tussen verschillende segmentRoutes moet gebeuren. Bij aanmaak worden vijf argumenten meegegeven met een optioneel zesde:
+\newpage
+
+\subsection{switch} % OK
+Dit ADT stelt een wissel voor. Er wordt bijgehouden welke segmenten met de wissel bereikbaar zijn, wat de huidig status is maar ook eventueel in welke volgorde een schakeling moet gebeuren. Bij aanmaak worden drie argumenten meegegeven met een optioneel vierde:
 \begin{itemize}
-  \item name: Een naam voor de wissel.
   \item id: Een uniek ID voor de wissel.
-  \item layout: Een layout-ID dat de GUI kan gebruiken om te bepalen hoe de wissel getoond moet worden.
-  \item segmentRoutes: Een lijst (minimale lengte 2) met de mogelijke segmentRoutes.
-  \item default: Welke segmentRoute wordt gezien als de "default" (d.w.z. conceptueel gezien rechtdoor)?
-  \item switchOrder: Optioneel zesde argument dat aangeeft hoe er tussen de verschillende mogelijke segmentRoutes geschakeld moet worden.
+  \item segments: Een lijst (minimale lengte 3) met de mogelijke segmenten die bereikbaar zijn met deze wissel.
+  \item default: Welke status wordt gezien als de "default" (d.w.z. conceptueel gezien rechtdoor)?
+  \item switchOrder: Optioneel vierde argument dat aangeeft hoe er tussen de verschillende mogelijke statussen geschakeld moet worden.
 \end{itemize}
 Volgende boodschappen worden door het ADT ondersteund:
 \begin{center}
     \begin{tabular}{ | l | l | l | p{8cm} |}
     \hline
     Commando & Argument(en) & Return value & Omschrijving \\ \hline
-    getName & / & name (string) & Geeft de naam van de wissel terug in de vorm van een string. \\ \hline
     getID & / & id (string) & Geeft het ID van de wissel terug in de vorm van een string. \\ \hline
-    getLayout & / & layout (string) & Geeft de layout van de wissel terug in de vorm van een string. \\ \hline
-    getActive & / & active (segmentRoute) & Geeft de huidig actieve segmentRoute terug in de vorm van een segmentRoute. \\ \hline
-    setActive! & mode (int) & / & Laat de wissel schakelen naar de gegeven mode. \\ \hline
+    getSegments & / & segments (list) & Geeft alle bereikbare segmenten hun ID terug in de vorm van een lijst. \\ \hline
+    getActive & / & active (list) & Geeft de huidig actieve status terug in de vorm van een lijst met daarin de IDs van bereikbare segmenten. \\ \hline
+    setActive! & mode (list) & / & Laat de wissel schakelen naar de gegeven mode. \\ \hline
     \end{tabular}
 \end{center}
 
 \subsection{segment}
-Een ADT dat een normaal treinsegment zonder wissels voorstelt. Er wordt bijgehouden welke segmentRoutes binnen het segment mogelijk zijn. Bij aanmaak worden 4 argumenten meegegeven:
+Een ADT dat een normaal treinsegment zonder wissels voorstelt. Er wordt bijgehouden welke segmenten bereikbaar zijn en of er eventueel lichten op het segment aanwezig zijn. Bij aanmaak worden twee argumenten meegegeven met een optioneel derde:
 \begin{itemize}
-  \item name: Een naam voor het segment.
   \item id: Een uniek ID voor het segment.
-  \item layout: Een layout-ID dat de GUI kan gebruiken om te bepalen hoe het segment getoond moet worden.
-  \item segmentRoutes: Een lijst met de mogelijke segmentRoutes.
+  \item segments: Een lijst met de bereikbare segmenten.
+  \item signal: Optioneel derde argument in de vorm van een signal-object dat aangeeft of er een licht op het segment aanwezig is
 \end{itemize}
 Volgende boodschappen worden door het ADT ondersteund:
 \begin{center}
-    \begin{tabular}{ | l | l | l | p{4cm} |}
+    \begin{tabular}{ | l | l | l | p{6cm} |}
     \hline
     Commando & Argument(en) & Return value & Omschrijving \\ \hline
-    getName & / & name (string) & Geeft de naam van het segment terug in de vorm van een string. \\ \hline
     getID & / & id (string) & Geeft het ID van het segment terug in de vorm van een string. \\ \hline
-    getLayout & / & layout (string) & Geeft de layout van het segment terug in de vorm van een string. \\ \hline
-    getSegmentRoute & destination (string) & segmentRoute (segmentRoute) & Geeft de segmentRoute naar de destination terug in de vorm van een segmentRoute. \\ \hline
+    getSegments & / & segments (list) & Geeft de bereikbare segmenten terug in de vorm van een lijst. \\ \hline
+    signalCommand & command (string) + extra (list) & result (string) & Zal het licht een bepaalt commando 'command' laten uitvoeren, eventueel met behulp van optionele paramaters 'extra' \\ \hline
     \end{tabular}
 \end{center}
 
