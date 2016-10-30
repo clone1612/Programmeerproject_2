@@ -114,10 +114,11 @@ Volgende boodschappen worden door het ADT ondersteund:
     switchChanged & switchID (string) + newPosition (number) & / & Logt dat een switch 'switchID' schakelt naar positie 'newPosition'. \\ \hline
     signalChanged & signalID (string) + newStatus (string) & / & Logt dat een signaal 'signalID' een nieuwe status 'newStatus' heeft. \\ \hline
     messageSend & message (string) & / & Logt dat er een commando werd verstuurd naar Infrabel \\ \hline
+    getLogged & / & logged (list) & Geeft een lijst terug met daarin alle acties die werden gelogd sinds de laatste keer dat dit commando werd opgeroepen. \\ \hline
     \end{tabular}
 \end{center}
 
-Een apart commando is beschikbaar in de logger om aan te geven dat er een bericht werd verstuurd naar Infrabel. Aangezien in deel 2 deze via het netwerk moet bereikt worden is het handig om te weten of er wel degelijk een commando over het netwerk werd gestuurd.
+\noindent Een apart commando is beschikbaar in de logger om aan te geven dat er een bericht werd verstuurd naar Infrabel. Aangezien in deel 2 deze via het netwerk moet bereikt worden is het handig om te weten of er wel degelijk een commando over het netwerk werd gestuurd.
 
 \iffalse
 \subsection{position}
@@ -202,12 +203,13 @@ Volgende boodschappen worden door het ADT ondersteund:
     \end{tabular}
 \end{center}
 
-\subsection{segment}
-Een ADT dat een normaal treinsegment zonder wissels voorstelt. Er wordt bijgehouden welke segmenten bereikbaar zijn en of er eventueel lichten op het segment aanwezig zijn. Bij aanmaak worden twee argumenten meegegeven met een optioneel derde:
+\subsection{segment} % OK
+Een ADT dat een normaal treinsegment zonder wissels voorstelt. Er wordt bijgehouden welke segmenten bereikbaar zijn en of er eventueel lichten op het segment aanwezig zijn. Bij aanmaak worden twee argumenten meegegeven met een optioneel derde en vierde:
 \begin{itemize}
   \item id: Een uniek ID voor het segment.
   \item segments: Een lijst met de bereikbare segmenten.
-  \item signal: Optioneel derde argument in de vorm van een signal-object dat aangeeft of er een licht op het segment aanwezig is
+  \item signal: Optioneel derde argument in de vorm van een signal-object dat aangeeft of er een licht op het segment aanwezig is.
+  \item detection: Optioneel vierde argument dat aangeeft of er een detectieblok op dit segment aanwezig is.
 \end{itemize}
 Volgende boodschappen worden door het ADT ondersteund:
 \begin{center}
@@ -220,80 +222,81 @@ Volgende boodschappen worden door het ADT ondersteund:
     \end{tabular}
 \end{center}
 
-\subsection{controlSystem}
-Dit ADT is een ADT dat het infrastructuur- en beheergedeelte overkoepelt. Het zal er dan ook voor zorgen dat de boodschappen die het ontvangt worden doorgespeeld aan het conceptueel verantwoordelijke ADT. De reden waarom het op deze manier wordt gedaan is zodat wanneer de verantwoordelijkheid verandert, bv. de nmbs wordt verantwoordelijk voor de wissels, dan moet er niets veranderen bij objecten die wissels willen manipuleren. Zij geven gewoon aan dat ze dit willen doen aan het overkoepelde ADT en dit maakt dan ook uit wie verantwoordelijk is. Bij aanmaak wordt 1 argument meegegeven:
-\begin{itemize}
-  \item logger: Een logger die het controlesysteem zal gebruiken.
-\end{itemize}
-Volgende boodschappen worden door het ADT ondersteund:
-\begin{center}
-    \begin{tabular}{ | l | p{4cm} | l | p{6cm} |}
-    \hline
-    Commando & Argument(en) & Return value & Omschrijving \\ \hline
-    addTrain & speed (number) + length (number) + pos (position) + name (string) + id (string) & / & Voegt een trein toe die zal worden beheerd door het controlSystem. \\ \hline
-    manipulateTrain & id (string) + command (string) + extra (list) & / & Zal een trein 'id' een bepaalt commando 'command' laten uitvoeren, eventueel aan de hand van optionele paramaters 'extra'. \\ \hline
-    manipulateSignal & id (string) + newStatus (string) & / & Zal de status van een signaal 'id' veranderen naar de meegegeven status 'newStatus'. \\ \hline
-    manipulateSwitch & id (string) + newMode (int) & / & Zal een wissel laten schakelen naar de nieuwe modus 'newMode' indien dit niet zorgt voor het onmogelijk maken van bepaalde routes. \\ \hline
-    manipulateSegment & id (string) + maxSpeed (int) & / & Zal een segment/wissel 'id' een maximumsnelheid 'maxSpeed' opleggen. \\ \hline
-    setRoute & id (string) + destination (string) & / & Zal een trein 'id' een route opleggen met bestemming 'destination'. \\ \hline
-    start & / & / & Zal het controlesysteem inschakelen. \\ \hline
-    stop & / & / & Zal het controlesysteem uitschakelen. \\ \hline
-    \end{tabular}
-\end{center}
-
-\newpage
-
-\subsection{infrastructure}
+\subsection{infrabel} % OK
 ADT dat specifiek instaat voor de infrastructuur, d.w.z. het aansturen van wissels en signalisatie maar ook zorgt voor het respecteren van de veiligheid (afstand tussen treinen bijvoorbeeld). Bij aanmaak worden geen argumenten meegegeven.
 Volgende boodschappen worden door het ADT ondersteund:
 \begin{center}
     \begin{tabular}{ | l | p{4cm} | l | p{6cm} |}
     \hline
     Commando & Argument(en) & Return value & Omschrijving \\ \hline
-    addTrain & loco (locomotive) & / & Voegt een trein toe. \\ \hline
+    addTrain & id (string) + start (string) (+ wagons (list)) & / & Voegt een trein toe. \\ \hline
     manipulateTrain & id (string) + command (string) + extra (list) & / & Zal een trein 'id' een bepaalt commando 'command' laten uitvoeren, eventueel aan de hand van optionele paramaters 'extra'. \\ \hline
     manipulateSignal & id (string) + newStatus (string) & / & Zal de status van een signaal 'id' veranderen naar de meegegeven status 'newStatus'. \\ \hline
-    manipulateSwitch & id (string) + newMode (int) & / & Zal een wissel laten schakelen naar de nieuwe modus 'newMode' indien dit niet zorgt voor het onmogelijk maken van bepaalde routes. \\ \hline
-    manipulateSegment & id (string) + maxSpeed (int) & / & Zal een segment/wissel 'id' een maximumsnelheid 'maxSpeed' opleggen. \\ \hline
-    start & / & / & Zal het monitoren van de infrastructuur inschakelen. \\ \hline
-    stop & / & / & Zal het monitoren van de infrastructuur uitschakelen. \\ \hline
-    \end{tabular}
-\end{center}
-Alle manipulaties vertrekken vanuit dit ADT naar de simulator indien het een geldig commando is dat niet in conflict is met eerder uitgevoerde manipulaties en de geplande routes niet verstoord. Dit wordt gedaan met in het achterhoofd fase 2 omdat we zo onnodige communicatie met een extern apparaat vermijden indien we op voorhand al weten dat het commando niet zal worden uitgevoerd.
-
-\subsection{management}
-ADT dat instaat voor beheer van routes. Zal voor elk trein-ID een route bijhouden en op deze manier het infrastructuurgedeelte toestaan te bepalen welke wissels moeten schakelen. Bij aanmaak worden geen argumenten meegegeven.
-Volgende boodschappen worden door het ADT ondersteund:
-\begin{center}
-    \begin{tabular}{ | l | p{4cm} | l | p{8cm} |}
-    \hline
-    planRoute & start (string) + destination (string) & route & Plant een route tussen 'start' en 'destination' en geeft deze dan terug in de vorm van een route. \\ \hline
-    createRoute & start (string) + destination (string) + segments (list) & route & Maakt een route aan tussen 'start' en 'destination' die gebruik maakt van bepaalde segments/wissels en geeft deze dan terug in de vorm van een route. \\ \hline
-    assignRoute & id (string) + route (route) & / & Wijst aan een trein 'id' een bepaalde route 'route' toe. \\ \hline
-    getPosition & id (string) & pos (position) & Geeft terug waar een trein 'id' zich precies op zijn route bevindt in de vorm van een position. \\ \hline
+    manipulateSwitch & id (string) + newMode (int) & / & Zal een wissel laten schakelen naar de nieuwe modus 'newMode'. \\ \hline
+    getActions & / & actions (list) & Geeft een lijst terug met daarin alle uitgevoerde acties sinds de laatste keer dat dit commando werd opgeroepen. \\ \hline
+    start & / & / & Zal het monitoren inschakelen. \\ \hline
+    stop & / & / & Zal het monitoren uitschakelen. \\ \hline
     \end{tabular}
 \end{center}
 
-\subsection{simulator}
-Een ADT dat onze virtuele opstelling zal bijhouden. Encapsuleert dus een weergave van het veld, een raster van segmenten/wissels.
-Bij aanmaak worden geen argumenten meegegeven.
+\subsection{infrabelNode} % OK
+Dit ADT zal instaan voor de communicatie tussen het NMBS-gedeelte en het Infrabel-gedeelte van het programma. Hoewel in Deel 1 deze nog op hetzelfde systeem draaien is dit niet meer het geval in Deel 2 en daar willen we op voorbereid zijn. Conceptueel is het niet logisch dat het NMBS-gedeelte ook zou moeten zorgen voor netwerkcommunicatie, dus vandaar dat deze logica in een apart ADT wordt gestoken. Het ADT accepteert dezelfde commando's als het Infrabel-gedeelte. Bij aanmaak wordt \'{e}\'{e}n argument meegegeven:
+\begin{itemize}
+  \item logger: Een logger die het ADT zal gebruiken.
+\end{itemize}
 Volgende boodschappen worden door het ADT ondersteund:
 \begin{center}
     \begin{tabular}{ | l | p{4cm} | l | p{6cm} |}
     \hline
     Commando & Argument(en) & Return value & Omschrijving \\ \hline
-    addTrain & loco (locomotive) & / & Voegt een trein toe. \\ \hline
+    addTrain & id (string) + start (string) (+ wagons (list)) & / & Voegt een trein toe. \\ \hline
     manipulateTrain & id (string) + command (string) + extra (list) & / & Zal een trein 'id' een bepaalt commando 'command' laten uitvoeren, eventueel aan de hand van optionele paramaters 'extra'. \\ \hline
     manipulateSignal & id (string) + newStatus (string) & / & Zal de status van een signaal 'id' veranderen naar de meegegeven status 'newStatus'. \\ \hline
     manipulateSwitch & id (string) + newMode (int) & / & Zal een wissel laten schakelen naar de nieuwe modus 'newMode'. \\ \hline
-    manipulateSegment & id (string) + maxSpeed (int) & / & Zal een segment/wissel 'id' een maximumsnelheid 'maxSpeed' opleggen. \\ \hline
-    getLayout & / & layout (list) & Zal een lijst teruggegeven met de opbouw van het veld zodat we het kunnen tekenen. \\ \hline
-    start & / & / & Zal de simulator starten. \\ \hline
-    stop & / & / & Zal de simulator stoppen. \\ \hline
+    getActions & / & actions (list) & Geeft een lijst terug met daarin alle uitgevoerde acties sinds de laatste keer dat dit commando werd opgeroepen. \\ \hline
+    start & / & / & Zal het monitoren inschakelen. \\ \hline
+    stop & / & / & Zal het monitoren uitschakelen. \\ \hline
     \end{tabular}
 \end{center}
 
-\subsection{gui}
+\newpage
+
+\subsection{NMBS}
+ADT dat instaat voor beheer van routes. Zal voor elk locomotief een route bijhouden en op deze manier bepalen welke wissels moeten schakelen. Bij aanmaak wordt \'{e}\'{e}n argument meegegeven:
+\begin{itemize}
+  \item logger: Een logger die het ADT zal gebruiken.
+\end{itemize}
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | p{4cm} | l | p{6cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    createRoute & id (string) + start (string) + destination (string) + segments (list) & / & Wijst aan een trein 'id' een route toe tussen 'start' en 'destination' die eventueel gebruik maakt van bepaalde segmenten/wissels. \\ \hline
+    getDrawable & / & drawable (list) & Geeft een weergave van de opstelling terug die de GUI kan tekenen. \\ \hline
+    \end{tabular}
+\end{center}
+
+\subsection{layout}
+Een ADT dat onze virtuele opstelling zal bijhouden. Encapsuleert dus een weergave van het veld, een graf van segmenten/wissels en de treinen die er op rijden. Bij aanmaak worden geen argumenten meegegeven.
+Volgende boodschappen worden door het ADT ondersteund:
+\begin{center}
+    \begin{tabular}{ | l | p{4cm} | l | p{6cm} |}
+    \hline
+    Commando & Argument(en) & Return value & Omschrijving \\ \hline
+    addTrain & id (string) + start (string) (+ wagons (list)) & / & Voegt een trein toe. \\ \hline
+    manipulateTrain & id (string) + command (string) + extra (list) & / & Zal een trein 'id' een bepaalt commando 'command' laten uitvoeren, eventueel aan de hand van optionele paramaters 'extra'. \\ \hline
+    manipulateSignal & id (string) + newStatus (string) & / & Zal de status van een signaal 'id' veranderen naar de meegegeven status 'newStatus'. \\ \hline
+    manipulateSwitch & id (string) + newMode (list) & / & Zal een wissel laten schakelen naar de nieuwe modus 'newMode'. \\ \hline
+    getDrawable & / & drawable (list) & Zal een lijst teruggegeven met de opbouw van het veld zodat de GUI het kan tekenen. \\ \hline
+    getActions & / & actions (list) & Geeft een lijst terug met daarin alle uitgevoerde acties sinds de laatste keer dat dit commando werd opgeroepen. \\ \hline
+    processActions & actions (list) & / & Past een lijst met acties toe op de opstelling. \\ \hline
+    loadSchema & filename (string) & / & Laadt een opstelling vanuit het bestand 'filename'. \\ \hline
+    saveSchema & / & / & Schrijft de opstelling weg naar een bestand. \\ \hline
+    getIDs & / & IDs (list) & Geeft de IDs terug van alle onderdelen (segmenten, wissels en locomotieven) terug. \\ \hline
+    \end{tabular}
+\end{center}
+
+\subsection{GUI}
 ADT dat de interface en eigelijk het hele programma zal beheren. Bij aanmaak worden twee argumenten meegegeven:
 \begin{itemize}
   \item height: Hoe hoog moet het venster zijn?
@@ -304,24 +307,27 @@ Volgende booschappen worden door het ADT ondersteund:
     \begin{tabular}{ | l | l | l | p{8cm} |}
     \hline
     Commando & Argument(en) & Return value & Omschrijving \\ \hline
-    draw & / & / & Zorgt dat het venster zal worden getekend. \\ \hline
+    draw & rate (int) & / & Zorgt dat het venster elke 'rate' seconden opnieuw zal worden getekend. \\ \hline
     \end{tabular}
 \end{center}
-
-\newpage
+\noindent De GUI zal dus met behulp van een timer elke rate seconden het beeld refreshen (opnieuw tekenen). Daarvoor moet er natuurlijk eerst bepaalt worden wat er moet worden getekend. Dat zal de GUI aan het NMBS-gedeelte (verantwoordelijk voor de lay-out van de opstelling) vragen met behulp van het \textit{getDrawable} commando. Met de lijst die als return value terugkomt kan de GUI dan verder. \\
+\\
+Verder wordt ook user input gedetecteerd en vervolgens verwerkt. Commando's worden verstuurd naar hun verantwoordelijke ADTs (NMBS of infrabelNode). Resultaten van deze commando's worden getoond (= getekend) met de volgende refresh.
 
 \section{Planning}
 \begin{center}
     \begin{tabular}{ | l | l |}
     \hline
     Week & Omschrijving \\ \hline
-    6 & Design ADTs + werken aan verslag \\ \hline
-    7 & Finaliseren verslag + bouwen van ADT timer \\ \hline
-    8 & Afwerken ADTs locomotive, wagon, signal, position \\ \hline
-    9 & Afwerken ADTs segment, switch, route, segmentRoute \\ \hline
-    10 & Afwerken ADTs controlSystem, logger, infrastructure, management \\ \hline
-    11 & Afwerken simulator + communicatie tussen simulator en infrastructure/management \\ \hline
-    12 & Basis van GUI en communicatie tussen GUI en simulator/controlSystem \\ \hline
+    4 & Design ADTs \\ \hline
+    5 & Design ADTS + schrijven voorstudie \\ \hline
+    6 & Design ADTs, werken aan ADT wagon + finaliseren voorstudie \\ \hline
+    7 & Afwerken ADTs timer, locomotive, wagon, signal \\ \hline
+    8 & Afwerken ADTs segment, switch, route \\ \hline
+    9 & Afwerken ADTs logger, layout \\ \hline
+    10 & Werken aan ADTs NMBS, infrabel, infrabelNode \\ \hline
+    11 & Afwerken ADTs NMBS, infrabel, infrabelNode \\ \hline
+    12 & Basis van GUI en communicatie tussen GUI en NMBS/infrabelNode \\ \hline
     13 & GUI \\ \hline
     14 & GUI afwerken \\ \hline
     15 & Nakijken code + werken aan verslag \\ \hline
