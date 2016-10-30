@@ -10,3 +10,6 @@
     (if (not (void? procedure))
         (apply procedure parameters)
         (display (string-append "ERROR - Object does not recognize given message -> " (symbol->string message))))))
+
+(define (print-test testSuite testName testResult)
+  (display (string-append testName " --> " testResult " (" testSuite ")")))
