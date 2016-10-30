@@ -1,6 +1,7 @@
 \documentclass{article}
 
 \usepackage{fullpage}
+\usepackage[dutch]{babel}
 \usepackage{graphicx}
 \usepackage[backend=biber]{biblatex}
 
@@ -47,7 +48,7 @@ Volgende boodschappen worden door het ADT ondersteund:
     Commando & Argument(en) & Return value & Omschrijving \\ \hline
     getOrigin & / & origin (string) & Geeft de oorsprong van de route terug in de vorm van een string. \\ \hline
     getDestination & / & destination (string) & Geeft de bestemming van de route terug in de vorm van een string. \\ \hline
-    getLength & / & length (number) & Geeft de lengte van de route terug in de vorm van een number. \\ \hline
+    getLength & / & length (int) & Geeft de lengte van de route terug. \\ \hline
     detected! & / & / & Geeft aan dat we het volgende detectieblok voorbij zijn en dat we dit hier ook moeten aanpassen. Op deze manier weten we hoe ver we gevorderd zijn op de route en kunnen we indien nodig een trein die het kortst bij zijn bestemming is een hogere prioriteit geven bij een obstakel/ongeval. \\ \hline
     getTodo & / & todo (list) & Zorgt ervoor dat we een lijst terugkrijgen met daarin de route tot aan het volgende detectieblok. \\ \hline
     \end{tabular}
@@ -76,7 +77,7 @@ Dit wordt steeds herhaald tot de timer de boodschap 'stop' ontvangt. Volgende bo
     Commando & Argument(en) & Return value & Omschrijving \\ \hline
     start & / & / & Laat de timer starten \\ \hline
     stop & / & / & Laat de timer stoppen \\ \hline
-    setTimerLength! & timerLength (number) & / & Past de lengte van de timer aan naar de meegegeven lengte. \\ \hline
+    setTimerLength! & timerLength (int) & / & Past de lengte van de timer aan naar de meegegeven lengte. \\ \hline
     setObject! & object (object) & / & Stuur de boodschap naar een ander object, zijnde het meegegeven object. \\ \hline
     setMessage! & message (string) & / & Stuur een andere boodschap naar het object, zijnde de meegegeven boodschap. \\ \hline
     \end{tabular}
@@ -120,32 +121,12 @@ Volgende boodschappen worden door het ADT ondersteund:
 
 \noindent Een apart commando is beschikbaar in de logger om aan te geven dat er een bericht werd verstuurd naar Infrabel. Aangezien in deel 2 deze via het netwerk moet bereikt worden is het handig om te weten of er wel degelijk een commando over het netwerk werd gestuurd.
 
-\iffalse
-\subsection{position}
-Een klein ADT dat een positie zal voorstellen. In dit geval op een x- en y-as maar dit kan makkelijk worden aangepast. Bij aanmaak worden twee argumenten meegegeven:
-\begin{itemize}
-  \item x: Positie op de x-as
-  \item y: Positie op de y-as
-\end{itemize}
-Volgende boodschappen worden door het ADT ondersteund:
-\begin{center}
-    \begin{tabular}{ | l | l | l | p{8cm} |}
-    \hline
-    Commando & Argument(en) & Return value & Omschrijving \\ \hline
-    getX & / & x (number) & Geeft de positie op de x-as terug in de vorm van een number. \\ \hline
-    getY & / & y (number) & Geeft de positie op de y-as terug in de vorm van een number. \\ \hline
-    setX! & newX (number) & / & Past de positie op de x-as aan naar de gegeven positie. \\ \hline
-    setY! & newY (number) & / & Past de positie op de y-as aan naar de gegeven positie. \\ \hline
-    \end{tabular}
-\end{center}
-\fi
-
 \newpage
 \subsection{locomotive} % OK
 Het ADT dat een locomotief zal voorstellen en ook zal bijhouden welke wagons er eventueel aan vasthangen. Bij aanmaak worden twee argumenten meegegeven met een optioneel derde:
 \begin{itemize}
   \item id: Een uniek ID voor de trein.
-  \item position: Beginpositie van de trein.
+  \item position: Beginpositie van de trein (een ID van een segment of wissel).
   \item wagons: Optioneel derde argument dat de wagons vastgemaakt aan de locomotief bevat.
 \end{itemize}
 Volgende boodschappen worden door het ADT ondersteund:
@@ -154,8 +135,8 @@ Volgende boodschappen worden door het ADT ondersteund:
     \hline
     Commando & Argument(en) & Return value & Omschrijving \\ \hline
     getID & / & id (string) & Geeft het unieke ID van de locomotief terug in de vorm van een string. \\ \hline
-    getSpeed & / & speed (number) & Geeft de snelheid van de locomotief terug in de vorm van een number. \\ \hline
-    setSpeed! & newSpeed (number) & / & Past de snelheid van de locomotief aan naar de meegegeven snelheid. \\ \hline
+    getSpeed & / & speed (int) & Geeft de snelheid van de locomotief terug in de vorm van een integer. \\ \hline
+    setSpeed! & newSpeed (int) & / & Past de snelheid van de locomotief aan naar de meegegeven snelheid. \\ \hline
     getLastSeen & / & lastSeen (string) & Geeft het segment (detectieblok) terug waar de locomotief voor het laatst werd gezien. \\ \hline
     updateLastSeen! & lastSeen (string) & / & Past aan waar de locomotief voor het laatst werd gezien. \\ \hline
     \end{tabular}
@@ -204,7 +185,7 @@ Volgende boodschappen worden door het ADT ondersteund:
 \end{center}
 
 \subsection{segment} % OK
-Een ADT dat een normaal treinsegment zonder wissels voorstelt. Er wordt bijgehouden welke segmenten bereikbaar zijn en of er eventueel lichten op het segment aanwezig zijn. Bij aanmaak worden twee argumenten meegegeven met een optioneel derde en vierde:
+Een ADT dat een normaal treinsegment zonder wissels voorstelt. Er wordt bijgehouden welke segmenten bereikbaar zijn en of er eventueel lichten en een detectieblok op het segment aanwezig zijn. Bij aanmaak worden twee argumenten meegegeven met een optioneel derde en vierde:
 \begin{itemize}
   \item id: Een uniek ID voor het segment.
   \item segments: Een lijst met de bereikbare segmenten.
@@ -271,7 +252,7 @@ Volgende boodschappen worden door het ADT ondersteund:
     \begin{tabular}{ | l | p{4cm} | l | p{6cm} |}
     \hline
     Commando & Argument(en) & Return value & Omschrijving \\ \hline
-    createRoute & id (string) + start (string) + destination (string) + segments (list) & / & Wijst aan een trein 'id' een route toe tussen 'start' en 'destination' die eventueel gebruik maakt van bepaalde segmenten/wissels. \\ \hline
+    createRoute & id (string) + start (string) + destination (string) (+ segments (list)) & / & Wijst aan een trein 'id' een route toe tussen 'start' en 'destination' die eventueel gebruik maakt van bepaalde segmenten/wissels. \\ \hline
     getDrawable & / & drawable (list) & Geeft een weergave van de opstelling terug die de GUI kan tekenen. \\ \hline
     \end{tabular}
 \end{center}
