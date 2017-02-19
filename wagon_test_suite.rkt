@@ -2,68 +2,52 @@
 
 (require "wagon.rkt")
 (require "utilities.rkt")
+(require rackunit)
+(require rackunit/text-ui)
 
-(define (wagon-test-suite)
+(define wagon-tests
+  (test-suite
+   "Tests for wagon.rkt"
 
-  (define (run-test-suite)
-    (let ((wagon (make-wagon "wagon1" "passengers"))
-          (success TRUE)
-          (failureList '())
-          (failedString "Test failed: "))
+   (test-case
+    "Wagon has wagon1 as ID - test getID"
+    (let ((wagon (make-wagon "wagon1" "passengers")))
+      (check-equal? (send wagon 'getID) "wagon1")))
 
-      ; Tests the "getID" command
-      (unless (equal? (send wagon 'getID) "wagon1")
-        (set! success FALSE)
-        (displayln (string-append failedString "getID")))
+   (test-case
+    "Wagon has passengers as Type - test getType"
+    (let ((wagon (make-wagon "wagon1" "passengers")))
+      (check-equal? (send wagon 'getType) "passengers")))
 
-      ; Tests the "getType" command
-      (unless (equal? (send wagon 'getType) "passengers")
-        (set! success FALSE)
-        (displayln (string-append failedString "getType")))
-
-      ; Tests the "setType!" command
+   (test-case
+    "setType! should change the wagon type as expected"
+    (let ((wagon (make-wagon "wagon1" "passengers")))
       (send wagon 'setType! "coal")
+      (check-equal? (send wagon 'getType) "coal")))
 
-      (unless (equal? (send wagon 'getType) "coal")
-        (set! success FALSE)
-        (displayln (string-append failedString "setType!")))
+   (test-case
+    "Wagon as 0 as initial load - test getLoad"
+    (let ((wagon (make-wagon "wagon1" "passengers")))
+      (check-equal? (send wagon 'getLoad) 0)))
 
-      ; Tests the "getLoad" command
-      (unless (equal? (send wagon 'getLoad) 0)
-        (set! success FALSE)
-        (displayln (string-append failedString "getLoad")))
-
-      ; Tests the "load!" command
+   (test-case
+    "load! should increase the load as expected"
+    (let ((wagon (make-wagon "wagon1" "passengers")))
       (send wagon 'load! 150)
+      (check-equal? (send wagon 'getLoad) 150)))
 
-      (unless (equal? (send wagon 'getLoad) 150)
-        (set! success FALSE)
-        (displayln (string-append failedString "load!")))
+   (test-case
+    "unload! with an acceptable amount should decrease the load as expected"
+    (let ((wagon (make-wagon "wagon1" "passengers")))
+      (send wagon 'load! 150)
+      (send wagon 'unload! 100)
+      (check-equal? (send wagon 'getLoad) 50)))
 
-      ; Tests the "unload!" command - Acceptable unload amount should work
-      (send wagon 'unload! 50)
+   (test-case
+    "unload! with an unacceptable amount should not work"
+    (let ((wagon (make-wagon "wagon1" "passengers")))
+      (send wagon 'load! 150)
+      (send wagon 'unload! 200)
+      (check-equal? (send wagon 'getLoad) 150)))))
 
-      (unless (equal? (send wagon 'getLoad) 100)
-        (set! success FALSE)
-        (displayln (string-append failedString "unload!")))
-
-      ; Tests the "unload!" command - Unacceptable unload amount should not work
-      (send wagon 'unload! 150)
-
-      (unless (equal? (send wagon 'getLoad) 100)
-        (set! success FALSE)
-        (displayln (string-append failedString "unload!")))
-
-      (if success
-          (displayln "All tests run with success!")
-          (displayln "Some test(s) failed"))))
-
-  (define (dispatch message)
-      (case message
-        ((run-test-suite) run-test-suite)
-        (else (displayln "WAGON TEST SUITE: Unknown message..."))))
-
-  dispatch)
-
-(define test (wagon-test-suite))
-(send test 'run-test-suite)
+(run-tests wagon-tests)
