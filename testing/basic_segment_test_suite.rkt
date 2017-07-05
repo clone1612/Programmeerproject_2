@@ -1,6 +1,6 @@
 #lang racket
 
-(require "basic_segment.rkt")
+(require "../railway/basic_segment.rkt")
 (require "../utilities/utilities.rkt")
 (require rackunit)
 (require rackunit/text-ui)
