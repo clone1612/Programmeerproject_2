@@ -30,6 +30,10 @@
           (sleep 0.1)
           (while))))
 
+    (define (test a b)
+      (displayln a)
+      (displayln b))
+
     (define (infrabel-loop)
       (when running?
         ; Listen to incoming requests
