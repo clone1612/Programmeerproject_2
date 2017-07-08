@@ -41,7 +41,7 @@
           (define-values (in out) (tcp-accept tcp-listener))
           (let ((received-command (read in)))
             (displayln received-command)
-            (write "Pong \n" out)
+            (write "Pong" out)
             (flush-output out)
             (close-input-port in)
             (close-output-port out)

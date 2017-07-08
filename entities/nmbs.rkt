@@ -30,7 +30,7 @@
       (when running?
         ; Send needed requests
         (define-values (in out) (tcp-connect "localhost" 9883))
-        (write "Ping \n" out)
+        (write "Ping" out)
         (flush-output out)
         (displayln (read in))
         (close-input-port in)
