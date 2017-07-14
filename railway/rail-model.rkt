@@ -47,11 +47,24 @@
 
     (set! rail-model-graph (parse-graph-file filename))
 
+    ; Helper function that will handle the addition of new elements to the model
+    (define (add-to-model id to length element)
+      ; Add vertex to the graph
+      (add-vertex! rail-model-graph id)
+      ; Add edge to the graph
+      (add-edge! rail-model-graph id to length)
+      ; Add actual element to the model
+      (hash-set! id-to-object-hash id element))
+
     (define (add-segment id length max-speed to)
-      (println id length max-speed to))
+      (add-to-model id to (make-basic-segment id length max-speed)))
+
+    (define (add-detection-block id length max-speed to)
+      (add-to-model id to (make-detection-block id length max-speed)))
 
     (define (dispatch message)
       (case message
-        ((add-segment) add-segment)))
+        ((add-segment) add-segment)
+        ((add-detection-block) add-detection-block)))
 
     dispatch))

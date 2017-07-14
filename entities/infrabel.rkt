@@ -5,7 +5,7 @@
 (define (infrabel)
   (let ((current-thread FALSE)
         (running? FALSE)
-        (loop-wait 0.01)
+        (loop-wait 1.0)
         (loop-virtual-time 1.0)
         (tcp-listener FALSE))
 
