@@ -5,7 +5,8 @@
 (define (make-detection-block _id _length _max-speed)
   (let ((id _id)
         (length _length)
-        (max-speed _max-speed))
+        (max-speed _max-speed)
+        (object-type "detection-block"))
 
     ; Function that will return the id of the detection block
     ; @return -> id
@@ -37,6 +38,11 @@
     (define (set-max-speed! new-max-speed)
       (set! max-speed new-max-speed))
 
+    ; Function that will return the type of object this represents
+    ; @return -> object type (string)
+    (define (get-object-type)
+      object-type)
+
     (define (dispatch message)
       (case message
         ((get-id) get-id)
@@ -45,6 +51,7 @@
         ((set-length!) set-length!)
         ((get-max-speed) get-max-speed)
         ((set-max-speed!) set-max-speed!)
+        ((get-object-type) get-object-type)
         (else (displayln "DETECTION-BLOCK: Unknown message..."))))
 
     dispatch))

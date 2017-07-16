@@ -9,7 +9,8 @@
   (let ((id _id)
         (start _start)
         (to '())
-        (mode 1))
+        (mode 1)
+        (object-type "switch"))
 
     (if (eq? _to-3 '())
         (set! to (vector _to-1 _to-2))
@@ -35,16 +36,33 @@
     (define (get-mode)
       mode)
 
-    ; Function that will return information about a given mode
-    ; @return -> mode information (mode start to length)
-    (define (get-mode-info mode)
-      (let ((to-info (vector-ref to (- mode 1))))
-        (switch-mode-info mode start (car to-info) (cadr to-info))))
+    ; Function that will return the path of a given mode
+    ; @param mode -> mode we want to know the path of
+    ; @return -> path (list)
+    (define (get-mode-path mode)
+      (switch-mode-info mode start (car (vector-ref to (- mode 1))) (cadr (vector-ref to (- mode 1)))))
+
+    ; Function that will return the mode required to go from 'from' to 'to'
+    ; @param _from -> starting point of the route we want to take
+    ; @param _to -> end point of the route we want to take
+    ; @return -> mode this switch needs to be in for that route to be possible
+    (define (find-required-mode _from _to)
+      (define result -1)
+      (for ([i (vector-length to)])
+        (let ([possible (car (vector-ref to i))])
+          (when (or (equal? possible _to) (equal? possible _from))
+              (set! result (+ i 1)))))
+      result)
 
     ; Function that will modify the mode of the switch
     ; @param new-mode -> new mode of the switch
     (define (set-mode! new-mode)
       (set! mode new-mode))
+
+    ; Function that will return the type of object this represents
+    ; @return -> object type (string)
+    (define (get-object-type)
+      object-type)
 
     (define (dispatch message)
       (case message
@@ -52,8 +70,10 @@
         ((set-id!) set-id!)
         ((get-start) get-start)
         ((get-mode) get-mode)
-        ((get-mode-info) get-mode-info)
+        ((get-mode-path) get-mode-path)
         ((set-mode!) set-mode!)
+        ((get-object-type) get-object-type)
+        ((find-required-mode) find-required-mode)
         (else (displayln "SWITCH: Unknown message..."))))
 
     dispatch))
