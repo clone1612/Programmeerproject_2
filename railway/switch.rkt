@@ -64,6 +64,14 @@
     (define (get-object-type)
       object-type)
 
+    ; Function that will return a writable string that we can later parse to build this object
+    (define (get-writable)
+      (define result (list "OS" id start))
+      (for ([i (vector-length to)])
+        (set! result (append result (list (car (vector-ref to i))))))
+      result)
+      
+
     (define (dispatch message)
       (case message
         ((get-id) get-id)
@@ -74,6 +82,7 @@
         ((set-mode!) set-mode!)
         ((get-object-type) get-object-type)
         ((find-required-mode) find-required-mode)
+        ((get-writable) get-writable)
         (else (displayln "SWITCH: Unknown message..."))))
 
     dispatch))

@@ -53,6 +53,13 @@
       (println (get-edges rail-model-graph))
       (println (hash-keys id-to-object-hash)))
 
+    ; Function that will save our model
+    (define (save-graph-file filename)
+      ; Helper function to write all IDs
+      ; Helper function to write all edges
+      ; Helper function to write all objects
+      "TODO")
+
     (set! rail-model-graph (parse-graph-file filename))
 
     ; Function that will return the object corresponding with a certain id

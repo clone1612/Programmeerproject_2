@@ -55,6 +55,11 @@
     "We should be able to find the required switch mode for a path to be possible"
     (let ((switch (make-switch "switch-1" "bla1" '("bla2" 175) '("bla3" 200))))
       (check-equal? (send switch 'find-required-mode "bla1" "bla2") 1)
-      (check-equal? (send switch 'find-required-mode "bla2" "bla1") 1)))))
+      (check-equal? (send switch 'find-required-mode "bla2" "bla1") 1)))
+
+   (test-case
+    "We should be able to get a writable string representing the object"
+    (let ((switch (make-switch "switch-1" "bla1" '("bla2" 175) '("bla3" 200))))
+      (check-equal? (send switch 'get-writable) (list "OS" "switch-1" "bla1" "bla2" "bla3"))))))
 
 (run-tests switch-tests)
