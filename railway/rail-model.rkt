@@ -6,11 +6,13 @@
 (require "basic_segment.rkt")
 (require "detection_block.rkt")
 (require "switch.rkt")
+(require "locomotive.rkt")
 (require graph)
 
 (define (make-rail-model filename)
   (let ((id-to-object-hash FALSE)
-        (rail-model-graph FALSE))
+        (rail-model-graph FALSE)
+        (locomotives '()))
 
     ; Based on the file create the graph linking showing connected id's with the distance between them
     (define (parse-graph-file graph-file)
@@ -43,7 +45,12 @@
                          [d2 (cons (string->symbol (list-ref l 4)) 0)])
                      (if (= (length l) 5)
                          (hash-set! id-to-object-hash id (make-switch id start d1 d2))
-                         (hash-set! id-to-object-hash id (make-switch id start d1 d2 (cons (string->symbol (list-ref l 5)) 0)))))]))
+                         (hash-set! id-to-object-hash id (make-switch id start d1 d2 (cons (string->symbol (list-ref l 5)) 0)))))]
+             [(OL) (let ([id (string->symbol (list-ref l 1))]
+                         [front (string->symbol (list-ref l 2))]
+                         [back (string->symbol (list-ref l 3))])
+                     (set! locomotives (append locomotives id))
+                     (hash-set! id-to-object-hash id (make-locomotive front back)))]))
          lines))
       ; Clean up graph
       (remove-vertex! rail-model-graph 'foo)
