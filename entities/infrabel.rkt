@@ -52,6 +52,16 @@
         (send model 'set-object! id loco)
         success-string))
 
+    (define (swap-loco-direction id)
+      (let* ([loco (send model 'get-object id)]
+             [loco-speed (send loco 'get-speed)])
+        ; TODO - Send to hardware/simulator
+        ;
+        ; Update the model
+        (send loco 'set-speed! (- loco-speed))
+        (send model 'set-object! id loco)
+        success-string))
+
     ; Helper function that will process received commands
     ; @param command -> command we want to process
     ; @return -> result of the processing
@@ -62,7 +72,13 @@
                             [new-speed (string->number (list-ref command 2))])
                         (set-loco-speed! id new-speed))]
         [(get-speed) (let ([id (string->symbol (list-ref command 1))])
-                       (get-loco-speed id))]))
+                       (get-loco-speed id))]
+        [(swap-direction) (let ([id (string->symbol (list-ref command 1))])
+                            (swap-loco-direction id))]
+        [(start-loco) (let ([id (string->symbol (list-ref command 1))])
+                        (set-loco-speed! id 5))]
+        [(stop-loco) (let ([id (string->symbol (list-ref command 1))])
+                       (set-loco-speed! id 0))]))
 
     (define (infrabel-loop)
       (when running?
