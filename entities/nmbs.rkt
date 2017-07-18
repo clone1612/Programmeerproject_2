@@ -2,6 +2,8 @@
 
 (require "../utilities/utilities.rkt")
 
+(provide nmbs)
+
 (define (nmbs)
   (let ((current-thread FALSE)
         (running? FALSE)

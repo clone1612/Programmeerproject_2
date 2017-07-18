@@ -9,4 +9,4 @@ E B C 350
 OBS basic1 50
 OS switch1 a b c
 OS switch2 a b c D
-OL loco1 B A
+OL 1 B A

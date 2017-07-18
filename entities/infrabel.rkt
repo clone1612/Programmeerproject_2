@@ -2,6 +2,9 @@
 
 (require "../utilities/utilities.rkt")
 (require "../railway/rail-model.rkt")
+(require "hardware-communication.rkt")
+
+(provide infrabel)
 
 (define (infrabel)
   (let ((current-thread FALSE)
@@ -11,7 +14,8 @@
         (tcp-listener FALSE)
         (model-filename "../testing/test.txt")
         (model FALSE)
-        (success-string "DONE"))
+        (success-string "DONE")
+        (hardware (make-hardware-communication FALSE)))
 
     ; Start the infrabel service
     (define (start)
@@ -35,23 +39,29 @@
           (sleep 0.1)
           (while))))
 
-    (define (test a b)
-      (displayln a)
-      (displayln b))
-
+    ; Helper function that will return the speed of a locomotive
+    ; @param id -> id of the locomotive
+    ; @return -> speed (number)
     (define (get-loco-speed id)
       (let ([loco (send model 'get-object id)])
         (send loco 'get-speed)))
 
+    ; Helper function that will modify the speed of a locomotive
+    ; @param id -> id of the locomotive
+    ; @param new-speed -> new speed
+    ; @return -> success string if update was successful
     (define (set-loco-speed! id new-speed)
       (let ([loco (send model 'get-object id)])
         ; TODO - Send to hardware/simulator
-        ;
+        (send hardware 'set-speed! id new-speed)
         ; Update the model
         (send loco 'set-speed! new-speed)
         (send model 'set-object! id loco)
         success-string))
 
+    ; Helper function that will swap the direction of a locomotive
+    ; @param id -> id of the locomotive
+    ; @return -> success string if swap was successful
     (define (swap-loco-direction id)
       (let* ([loco (send model 'get-object id)]
              [loco-speed (send loco 'get-speed)])
