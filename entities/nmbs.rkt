@@ -26,20 +26,26 @@
           (sleep 0.1)
           (while))))
 
+    ; Helper function that will send a command to infrabel
+    ; @param command -> command we want to send to infrabel
+    (define (send-command command)
+      (define-values (in out) (tcp-connect "localhost" 9883))
+      (write command out)
+      (flush-output out)
+      (displayln (read in))
+      (close-input-port in)
+      (close-output-port out))
+
     (define (nmbs-loop)
       (when running?
-        ; Send needed requests
-        (define-values (in out) (tcp-connect "localhost" 9883))
-        (write "Ping" out)
-        (flush-output out)
-        (displayln (read in))
-        (close-input-port in)
-        (close-output-port out)
+        ; TODO - For all trains with a route do some stuff
+        ;
         (sleep loop-wait)
         (nmbs-loop)))
 
     (define (dispatch message)
       (case message
+        ((send-command) send-command)
         ((start) start)
         ((stop) stop)))
 

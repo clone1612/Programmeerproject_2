@@ -75,6 +75,12 @@
     (define (get-object id)
       (hash-ref id-to-object-hash id))
 
+    ; Function that will modify the object corresponding with a certain id
+    ; @param id -> id of the object we want to modify
+    ; @param new-object -> new object we want to link to the id
+    (define (set-object! id new-object)
+      (hash-set! id-to-object-hash id new-object))
+
     ; Helper function that will handle the addition of new elements to the model
     (define (add-to-model id to length element)
       ; Add vertex to the graph
@@ -93,6 +99,7 @@
     (define (dispatch message)
       (case message
         ((get-object) get-object)
+        ((set-object!) set-object!)
         ((add-segment) add-segment)
         ((add-detection-block) add-detection-block)))
 
