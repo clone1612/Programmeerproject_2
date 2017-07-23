@@ -33,7 +33,7 @@
              [(I) (add-vertex! rail-model-graph (string->symbol (list-ref l 1)))]
              [(E) (let ([id-1 (string->symbol (list-ref l 1))]
                         [id-2 (string->symbol (list-ref l 2))]
-                        [distance (string->symbol (list-ref l 3))])
+                        [distance (string->number (list-ref l 3))])
                     (add-edge! rail-model-graph id-1 id-2 distance))]
              [(OBS) (let ([id (string->symbol (list-ref l 1))]
                           [max-speed (string->symbol (list-ref l 2))])
@@ -88,8 +88,26 @@
                  (send route 'add-basic-segment id length))
                 ((equal? object-type "detection-block")
                  (send route 'add-detection-block id length)))))
+      (define (pathfinding from to)
+        (define-values (vertex-to-distance vertex-to-previous) (dijkstra rail-model-graph from))
+        (println vertex-to-distance)
+        (println vertex-to-previous)
+        ; Build up a path making use of the hash-map vertex-to-previous
+        (let* ([node1 to]
+               [node2 (hash-ref vertex-to-previous node1)]
+               [last node2]
+               [route-list (list to node2)])
+          (for ([i 50]
+                #:break (equal? node2 from))
+            (set! node1 node2)
+            (set! node2 (hash-ref vertex-to-previous node1))
+            (set! route-list (append route-list (list node2))))
+          (set! route-list (reverse route-list))
+          (println route-list)
+          (for ([i (- (length route-list) 1)])
+            (add-to-route (list-ref route-list i) (list-ref route-list (+ i 1))))))
       (if (equal? path '())
-          "TODO"
+          (pathfinding start destination)
           (for ([i (- (length path) 1)])
             (add-to-route (list-ref path i) (list-ref path (+ i 1)))))
       route)

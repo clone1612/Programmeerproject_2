@@ -20,6 +20,13 @@
     (let ([model (make-rail-model "test.txt")])
       (println "ROUTE: ")
       (println (send (send (send model 'generate-route 'B 'D (list 'B 'C 'D)) 'get-current-element) 'get-switch-mode))
+      (check-equal? 1 1)))
+
+   (test-case
+    "We should be able to generate a route with no provided path"
+    (let ([model (make-rail-model "test.txt")])
+      (println "ROUTE: ")
+      (println (send (send (send model 'generate-route 'B 'D) 'get-current-element) 'get-switch-mode))
       (check-equal? 1 1)))))
 
 (run-tests rail-model-tests)
