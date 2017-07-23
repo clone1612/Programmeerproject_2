@@ -6,7 +6,8 @@ I E
 E A B 250
 E B E 175
 E B C 350
-OBS basic1 50
-OS switch1 a b c
-OS switch2 a b c D
+E C D 450
+OBS A 50
+OBS C 50
+OS B B E C
 OL 1 B A

@@ -12,7 +12,14 @@
    (test-case
     "We should be able to load a file into the model"
     (let ([model (make-rail-model "test.txt")])
-      (println (send (send model 'get-object 'switch1) 'get-object-type))
+      (println (send (send model 'get-object 'B) 'get-object-type))
+      (check-equal? 1 1)))
+
+   (test-case
+    "We should be able to generate a route"
+    (let ([model (make-rail-model "test.txt")])
+      (println "ROUTE: ")
+      (println (send (send (send model 'generate-route 'B 'D (list 'B 'C 'D)) 'get-current-element) 'get-switch-mode))
       (check-equal? 1 1)))))
 
 (run-tests rail-model-tests)

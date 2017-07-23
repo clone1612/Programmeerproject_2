@@ -7,12 +7,14 @@
 (require "detection_block.rkt")
 (require "switch.rkt")
 (require "locomotive.rkt")
+(require "route.rkt")
 (require graph)
 
 (define (make-rail-model filename)
   (let ((id-to-object-hash FALSE)
         (rail-model-graph FALSE)
-        (locomotives '()))
+        (locomotives '())
+        (file filename))
 
     ; Based on the file create the graph linking showing connected id's with the distance between them
     (define (parse-graph-file graph-file)
@@ -67,7 +69,30 @@
       ; Helper function to write all objects
       "TODO")
 
-    (set! rail-model-graph (parse-graph-file filename))
+    (parse-graph-file filename)
+
+    ; Function that will generate a route based on a start, destination and possible path
+    ; @param start -> where the route starts
+    ; @param destination -> where the route should end
+    ; (@param path) -> list of nodes we should visit
+    (define (generate-route start destination [path '()])
+      (define route (make-route))
+      (define (add-to-route from to)
+        (let* ([length (edge-weight rail-model-graph from to)]
+               [id start]
+               [object (get-object id)]
+               [object-type (send object 'get-object-type)])
+          (cond ((equal? object-type "switch")
+                 (send route 'add-switch id length (send object 'find-required-mode from to)))
+                ((equal? object-type "basic-segment")
+                 (send route 'add-basic-segment id length))
+                ((equal? object-type "detection-block")
+                 (send route 'add-detection-block id length)))))
+      (if (equal? path '())
+          "TODO"
+          (for ([i (- (length path) 1)])
+            (add-to-route (list-ref path i) (list-ref path (+ i 1)))))
+      route)
 
     ; Function that will return the object corresponding with a certain id
     ; @param id -> id of the object we want to return
@@ -101,6 +126,7 @@
         ((get-object) get-object)
         ((set-object!) set-object!)
         ((add-segment) add-segment)
-        ((add-detection-block) add-detection-block)))
+        ((add-detection-block) add-detection-block)
+        ((generate-route) generate-route)))
 
     dispatch))
