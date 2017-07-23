@@ -97,7 +97,7 @@
                [node2 (hash-ref vertex-to-previous node1)]
                [last node2]
                [route-list (list to node2)])
-          (for ([i 50]
+          (for ([i (length (get-edges rail-model-graph))]
                 #:break (equal? node2 from))
             (set! node1 node2)
             (set! node2 (hash-ref vertex-to-previous node1))
