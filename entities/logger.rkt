@@ -11,7 +11,7 @@
     (define (write-message-to-file message)
       (let* ([current-time-date (date->string (current-date) #t)]
              [log-string (string-append current-time-date ": " message)])
-        (call-with-output-file "testing.txt"
+        (call-with-output-file file
           (lambda (out)
             (with-logging-to-port out
               (lambda ()
