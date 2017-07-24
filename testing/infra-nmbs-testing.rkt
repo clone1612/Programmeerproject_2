@@ -5,9 +5,9 @@
 (require "../utilities/utilities.rkt")
 
 (define i (infrabel))
-(define n (nmbs))
+;(define n (nmbs))
 
 (send i 'start)
-(send n 'start)
+;(send n 'start)
 
-(send n 'send-command "set-speed! 1 0.1")
+;(send n 'send-command "set-speed! 1 0.1")

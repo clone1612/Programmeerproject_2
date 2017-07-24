@@ -2,6 +2,11 @@
 
 (require racket/gui)
 
+(require "../entities/nmbs.rkt")
+(require (prefix-in ut: "../utilities/utilities.rkt"))
+
+(define nmbs-object (nmbs))
+
 ; Make a frame by instantiating the frame% class
 (define frame (new frame% [label "Example"]))
  
@@ -45,13 +50,16 @@
 
 (define panel (new horizontal-panel% [parent tab]))
 (new button% [parent panel]
-             [label "Left"]
+             [label "NMBS Start"]
              [callback (lambda (button event)
-                         (send msg set-label "Left click"))])
+                         (send msg set-label "NMBS started!")
+                         (ut:send nmbs-object 'start)
+                         (ut:send nmbs-object 'send-command "set-speed! 1 0.1"))])
 (new button% [parent panel]
-             [label "Right"]
+             [label "NMBS Stop"]
              [callback (lambda (button event)
-                         (send msg set-label "Right click"))])
+                         (send msg set-label "NMBS stopped!")
+                         (ut:send nmbs-object 'stop))])
 
 ; Draw all nodes
 (define (draw-nodes can dc)
