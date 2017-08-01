@@ -52,7 +52,6 @@
     ; @return -> success string if update was successful
     (define (set-loco-speed! id new-speed)
       (let ([loco (send model 'get-object id)])
-        ; TODO - Send to hardware/simulator
         (send hardware 'set-speed! id new-speed)
         ; Update the model
         (send loco 'set-speed! new-speed)
@@ -65,8 +64,7 @@
     (define (swap-loco-direction id)
       (let* ([loco (send model 'get-object id)]
              [loco-speed (send loco 'get-speed)])
-        ; TODO - Send to hardware/simulator
-        ;
+        (send hardware 'set-speed! (- loco-speed))
         ; Update the model
         (send loco 'set-speed! (- loco-speed))
         (send model 'set-object! id loco)
