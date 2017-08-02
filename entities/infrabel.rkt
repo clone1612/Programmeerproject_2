@@ -91,6 +91,13 @@
     ; Helper function that will process all locomotives in the model and execute all the safety checks
     (define (process-locomotives)
       (let ([loco-ids (send model 'get-locomotive-ids)])
+        (define (max-speed-check loco-id block-id)
+          (let* ([loco (send model 'get-object loco-id)]
+                 [block (send model 'get-object block-id)]
+                 [loco-speed (send loco 'get-speed)]
+                 [block-max-speed (send block 'get-max-speed)])
+            (when (> loco-speed block-max-speed)
+              (set-loco-speed! loco-id block-max-speed))))
         ; For all locomotives we will do some processing
         ; 1 - Get their current position (on detection block or not?)
         ; 2a - If not on detection block, do nothing (break)
@@ -100,8 +107,22 @@
         ; 5 - Set new red lights to green
         (map
          (lambda (id)
-           (let ([loco (send model 'get-object id)])
-             (println (send loco 'get-speed))))
+           (let* ([loco (send model 'get-object id)]
+                  [loco-model-position (send loco 'get-current-location)]
+                  [loco-position (send hardware 'get-detection-block id)])
+             (if loco-position
+                 (begin
+                   ; Update the model with the new position
+                   (send loco 'set-current-location! loco-position)
+                   (send loco 'set-previous-location! loco-model-position)
+                   (send model 'set-object! id loco)
+                   ; Check for speed safety
+                   (max-speed-check id loco-position)
+                   ; TODO -> set red/green lights
+                   ; Previous on green
+                   ; Following on red
+                   )
+                 success-string)))
          loco-ids)))
 
     (define (infrabel-loop)

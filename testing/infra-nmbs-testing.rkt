@@ -10,7 +10,7 @@
 (send i 'start)
 (send n 'start)
 
-;(send n 'send-command "set-speed! 1 0.1")
+(send n 'send-command "set-speed! 1 0.1")
 
 (define (stop)
   (send i 'stop)
