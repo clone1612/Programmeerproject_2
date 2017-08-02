@@ -51,7 +51,7 @@
              [(OL) (let ([id (string->symbol (list-ref l 1))]
                          [front (string->symbol (list-ref l 2))]
                          [back (string->symbol (list-ref l 3))])
-                     (set! locomotives (append locomotives id))
+                     (set! locomotives (append locomotives (list id)))
                      (hash-set! id-to-object-hash id (make-locomotive front back)))]))
          lines))
       ; Clean up graph
@@ -124,6 +124,11 @@
     (define (set-object! id new-object)
       (hash-set! id-to-object-hash id new-object))
 
+    ; Function that will return the id's of all locomotives present in the model
+    ; @return -> id's (list)
+    (define (get-locomotive-ids)
+      locomotives)
+
     ; Helper function that will handle the addition of new elements to the model
     (define (add-to-model id to length element)
       ; Add vertex to the graph
@@ -143,6 +148,7 @@
       (case message
         ((get-object) get-object)
         ((set-object!) set-object!)
+        ((get-locomotive-ids) get-locomotive-ids)
         ((add-segment) add-segment)
         ((add-detection-block) add-detection-block)
         ((generate-route) generate-route)))

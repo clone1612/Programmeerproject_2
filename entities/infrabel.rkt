@@ -88,6 +88,22 @@
         [(stop-loco) (let ([id (string->symbol (list-ref command 1))])
                        (set-loco-speed! id 0))]))
 
+    ; Helper function that will process all locomotives in the model and execute all the safety checks
+    (define (process-locomotives)
+      (let ([loco-ids (send model 'get-locomotive-ids)])
+        ; For all locomotives we will do some processing
+        ; 1 - Get their current position (on detection block or not?)
+        ; 2a - If not on detection block, do nothing (break)
+        ; 2b - If on detection block, continue
+        ; 3 - Update the position of the loco
+        ; 4 - Set previous red lights to green
+        ; 5 - Set new red lights to green
+        (map
+         (lambda (id)
+           (let ([loco (send model 'get-object id)])
+             (println (send loco 'get-speed))))
+         loco-ids)))
+
     (define (infrabel-loop)
       (when running?
         ; Listen to incoming requests
@@ -96,12 +112,14 @@
           (let* ((received-command (read in))
                  (processed-command (process-command (string-split received-command))))
             (displayln received-command)
+            (process-locomotives)
             (write processed-command out)
             (flush-output out)
             (close-input-port in)
             (close-output-port out)
             (sleep loop-wait)
             (infrabel-loop)))
+        (process-locomotives)
         (sleep loop-wait)
         (infrabel-loop)))
 
